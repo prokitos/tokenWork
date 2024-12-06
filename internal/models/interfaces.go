@@ -16,12 +16,6 @@ type IDatabase interface {
 	StartMigration()
 	GlobalSet()
 }
-type IDatabaseDao interface {
-	CreateData(ITable) IResponse
-	DeleteData(ITable) IResponse
-	UpdateData(ITable) IResponse
-	ShowData(ITable) IResponse
-}
 
 type ITable interface {
 	GetId() string

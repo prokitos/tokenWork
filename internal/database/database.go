@@ -3,7 +3,8 @@ package database
 import (
 	"fmt"
 	"mymod/internal/config"
-	"mymod/internal/models"
+	"mymod/internal/models/responses"
+	"mymod/internal/models/tables"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -11,25 +12,27 @@ import (
 	"gorm.io/gorm"
 )
 
-var GlobalPostgres *PostgresDatabase
+var GlobalPostgres *postgresDatabase
 
-type PostgresDatabase struct {
+type postgresDatabase struct {
 	Instance *gorm.DB
 }
 
 // запуск при старте сервера
-func (currentlDB *PostgresDatabase) Run(config config.MainConfig) {
+func (currentlDB *postgresDatabase) Run(config config.MainConfig) {
+	currentlDB = &postgresDatabase{}
 	currentlDB.openConnection(config)
 	currentlDB.startMigration()
 	currentlDB.globalSet()
 }
 
-func (currentlDB *PostgresDatabase) startMigration() {
-	currentlDB.Instance.AutoMigrate(models.Auth{})
+func (currentlDB *postgresDatabase) startMigration() {
+	currentlDB.Instance.AutoMigrate(tables.Auth{})
+	currentlDB.Instance.AutoMigrate(tables.Token{})
 	log.Debug("migration complete")
 }
 
-func (currentlDB *PostgresDatabase) openConnection(config config.MainConfig) {
+func (currentlDB *postgresDatabase) openConnection(config config.MainConfig) {
 
 	err := currentlDB.checkDatabaseCreated(config)
 	if err != nil {
@@ -57,14 +60,14 @@ func (currentlDB *PostgresDatabase) openConnection(config config.MainConfig) {
 }
 
 // проверка если есть база данных. если нет, то создать.
-func (currentlDB *PostgresDatabase) checkDatabaseCreated(config config.MainConfig) error {
+func (currentlDB *postgresDatabase) checkDatabaseCreated(config config.MainConfig) error {
 
 	// открытие соеднение с базой по стандарту
 	connectStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", config.PostgresDB.User, config.PostgresDB.Pass, config.PostgresDB.Host, config.PostgresDB.Port, "postgres")
 	db, err := gorm.Open(postgres.Open(connectStr), &gorm.Config{})
 	if err != nil {
 		log.Error("database don't open")
-		return models.ResponseBase{}.BaseServerError()
+		return responses.ResponseBase{}.BaseServerError()
 	}
 
 	// закрытие бд
@@ -78,7 +81,7 @@ func (currentlDB *PostgresDatabase) checkDatabaseCreated(config config.MainConfi
 	rs := db.Raw(stmt)
 	if rs.Error != nil {
 		log.Error("error, dont read bd")
-		return models.ResponseBase{}.BaseServerError()
+		return responses.ResponseBase{}.BaseServerError()
 	}
 
 	// если нет, то создать
@@ -87,13 +90,13 @@ func (currentlDB *PostgresDatabase) checkDatabaseCreated(config config.MainConfi
 		stmt := fmt.Sprintf("CREATE DATABASE %s;", config.PostgresDB.Name)
 		if rs := db.Exec(stmt); rs.Error != nil {
 			log.Error("error, dont create a database")
-			return models.ResponseBase{}.BaseServerError()
+			return responses.ResponseBase{}.BaseServerError()
 		}
 	}
 
 	return nil
 }
 
-func (currentlDB *PostgresDatabase) globalSet() {
+func (currentlDB *postgresDatabase) globalSet() {
 	GlobalPostgres = currentlDB
 }

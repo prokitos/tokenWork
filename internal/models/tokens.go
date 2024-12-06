@@ -38,7 +38,7 @@ type TokenPayloadData struct {
 	Time  time.Time
 }
 
-type Tokens struct {
+type TokenPair struct {
 	AccessToken  string
 	RefreshToken string
 }

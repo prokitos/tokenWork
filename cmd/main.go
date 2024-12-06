@@ -21,8 +21,7 @@ func main() {
 	cfg.ConfigMustLoad(CONFIG_TYPE)
 	log.Debug("config is loaded")
 
-	var pgdb database.PostgresDatabase
-	pgdb.Run(cfg)
+	databaseLoad(cfg)
 	log.Debug("databases is loaded")
 
 	var application app.App
@@ -33,5 +32,19 @@ func main() {
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 	<-stop
 	application.Stop()
+
+}
+
+// загрузка базы данных и настройка дао.
+func databaseLoad(cfg config.MainConfig) {
+	database.GlobalPostgres.Run(cfg)
+	// var pgdb database.PostgresDatabase
+	// pgdb.Run(cfg)
+	database.GlobalDaoAuth.New()
+	// var auth database.DaoAuth
+	// auth.New()
+	database.GlobalDaoToken.New()
+	// var token database.DaoAuth
+	// token.New()
 
 }
