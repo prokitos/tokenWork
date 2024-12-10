@@ -23,13 +23,3 @@ type ITable interface {
 	GetQueryParams() error
 	GetBodyParams() error
 }
-
-type IToken interface {
-	AddAccess()
-	AddRefresh()
-	addPayload()
-	GetError()
-	CreatePair()
-	VerifyToken()
-	RefreshToken()
-}

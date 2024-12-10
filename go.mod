@@ -39,6 +39,7 @@ require (
 )
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gofiber/fiber v1.14.6
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/ilyakaznacheev/cleanenv v1.5.0
