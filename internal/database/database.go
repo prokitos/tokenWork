@@ -16,6 +16,8 @@ var GlobalPostgres *postgresDatabase
 
 type postgresDatabase struct {
 	Instance *gorm.DB
+	DaoToken *daoToken
+	DaoAuth  *daoAuth
 }
 
 // запуск при старте сервера

@@ -2,34 +2,53 @@ package database
 
 import (
 	"mymod/internal/models"
+	"mymod/internal/models/responses"
 	"mymod/internal/models/tables"
 
-	"gorm.io/gorm"
+	log "github.com/sirupsen/logrus"
 )
 
-var GlobalDaoToken *daoToken
-
 type daoToken struct {
-	DB *gorm.DB
 }
 
 func (currentDao *daoToken) New() {
-	GlobalDaoToken = &daoToken{}
-	GlobalDaoToken.DB = GlobalPostgres.Instance
+	GlobalPostgres.DaoToken = &daoToken{}
 }
 
-func (currentDao *daoToken) CreateData(data tables.Token) models.IResponse {
+func (currentlDB *daoToken) curResponse() models.IResponse {
+	return responses.ResponseBase{}
+}
+
+func (currentDao *daoToken) UpdateData(data tables.Token) error {
+
+	var finded tables.Token
+	finderData := tables.Token{GUID: data.GUID}
+	result := GlobalPostgres.Instance.Find(&finded, finderData)
+	if result.RowsAffected == 0 {
+		if result := GlobalPostgres.Instance.Model(tables.Token{}).Create(&data); result.Error != nil {
+			return currentDao.curResponse().BadUpdate()
+		}
+		return nil
+	}
+
+	if result := GlobalPostgres.Instance.Where("guid= ?", data.GUID).Updates(&data); result.Error != nil {
+		return currentDao.curResponse().BadUpdate()
+	}
+
+	log.Debug("dao complete")
 	return nil
 }
 
-func (currentDao *daoToken) UpdateData(data tables.Token) models.IResponse {
-	return nil
-}
+func (currentDao *daoToken) ExistData(data tables.Token) (tables.Token, error) {
 
-func (currentDao *daoToken) DeleteData(data tables.Token) models.IResponse {
-	return nil
-}
+	var finded tables.Token
 
-func (currentDao *daoToken) ShowData(data tables.Token) models.IResponse {
-	return nil
+	results := GlobalPostgres.Instance.Find(&finded, data)
+	if results.Error != nil || results.RowsAffected == 0 {
+		log.Debug("show record error!")
+		return tables.Token{}, currentDao.curResponse().BadShow()
+	}
+
+	log.Debug("check complete")
+	return finded, nil
 }

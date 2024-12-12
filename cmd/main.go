@@ -38,13 +38,6 @@ func main() {
 // загрузка базы данных и настройка дао.
 func databaseLoad(cfg config.MainConfig) {
 	database.GlobalPostgres.Run(cfg)
-	// var pgdb database.PostgresDatabase
-	// pgdb.Run(cfg)
-	database.GlobalDaoAuth.New()
-	// var auth database.DaoAuth
-	// auth.New()
-	database.GlobalDaoToken.New()
-	// var token database.DaoAuth
-	// token.New()
-
+	database.GlobalPostgres.DaoToken.New()
+	database.GlobalPostgres.DaoAuth.New()
 }

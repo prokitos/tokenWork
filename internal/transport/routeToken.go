@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"mymod/internal/models"
 	"mymod/internal/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +19,7 @@ func getToken(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	var res services.TokenPair
+	var res models.TokenPair
 	res.AccessToken = acc
 	res.RefreshToken = ref
 
@@ -28,15 +29,18 @@ func getToken(c *fiber.Ctx) error {
 // делает рефреш токена. выдаёт новый аксес токен, проверяет совпадения и айпи
 func refreshToken(c *fiber.Ctx) error {
 
-	var access = c.Query("access", "")
-	var refresh = c.Query("refresh", "")
+	var tokens models.TokenPair
+	if err := c.BodyParser(&tokens); err != nil {
+		return err
+	}
 
 	var temp services.TokenData
-	acc, ref, err := temp.RefreshToken(access, refresh)
+	temp.AddTimestamp()
+	acc, ref, err := temp.RefreshToken(tokens.AccessToken, tokens.RefreshToken)
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	var res services.TokenPair
+	var res models.TokenPair
 	res.AccessToken = acc
 	res.RefreshToken = ref
 

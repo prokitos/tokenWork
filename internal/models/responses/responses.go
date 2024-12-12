@@ -48,6 +48,10 @@ func (instance ResponseBase) CustomTokenError(text string) error {
 	return instance.GetError()
 }
 
+func (instance ResponseBase) Validate() bool {
+	return true
+}
+
 func (instance ResponseBase) GetError() error {
 	return errors.New(instance.Description)
 }
