@@ -2,13 +2,14 @@ package models
 
 import (
 	"mymod/internal/config"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type IResponse interface {
-	GetError() error
 	Validate() bool
-	BadUpdate() error
-	BadShow() error
+	ToErrorBase() error
+	ToErrorFiber(c *fiber.Ctx) error
 }
 
 type IDatabase interface {

@@ -69,7 +69,7 @@ func (currentlDB *postgresDatabase) checkDatabaseCreated(config config.MainConfi
 	db, err := gorm.Open(postgres.Open(connectStr), &gorm.Config{})
 	if err != nil {
 		log.Error("database don't open")
-		return responses.ResponseBase{}.BaseServerError()
+		return responses.ResponseBase{}.BaseServerError().ToErrorBase()
 	}
 
 	// закрытие бд
@@ -83,7 +83,7 @@ func (currentlDB *postgresDatabase) checkDatabaseCreated(config config.MainConfi
 	rs := db.Raw(stmt)
 	if rs.Error != nil {
 		log.Error("error, dont read bd")
-		return responses.ResponseBase{}.BaseServerError()
+		return responses.ResponseBase{}.BaseServerError().ToErrorBase()
 	}
 
 	// если нет, то создать
@@ -92,7 +92,7 @@ func (currentlDB *postgresDatabase) checkDatabaseCreated(config config.MainConfi
 		stmt := fmt.Sprintf("CREATE DATABASE %s;", config.PostgresDB.Name)
 		if rs := db.Exec(stmt); rs.Error != nil {
 			log.Error("error, dont create a database")
-			return responses.ResponseBase{}.BaseServerError()
+			return responses.ResponseBase{}.BaseServerError().ToErrorBase()
 		}
 	}
 

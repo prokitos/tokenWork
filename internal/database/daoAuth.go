@@ -1,9 +1,6 @@
 package database
 
-import (
-	"mymod/internal/models"
-	"mymod/internal/models/tables"
-)
+import "mymod/internal/models/responses"
 
 type daoAuth struct {
 }
@@ -12,6 +9,6 @@ func (currentDao *daoAuth) New() {
 	GlobalPostgres.DaoAuth = &daoAuth{}
 }
 
-func (currentDao *daoAuth) CreateData(data tables.Auth) models.IResponse {
-	return nil
+func (currentlDB *daoAuth) curResponse() responses.ResponseToken {
+	return responses.ResponseToken{}
 }

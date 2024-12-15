@@ -15,11 +15,11 @@ func (currentDao *daoToken) New() {
 	GlobalPostgres.DaoToken = &daoToken{}
 }
 
-func (currentlDB *daoToken) curResponse() models.IResponse {
-	return responses.ResponseBase{}
+func (currentlDB *daoToken) curResponse() responses.ResponseToken {
+	return responses.ResponseToken{}
 }
 
-func (currentDao *daoToken) UpdateData(data tables.Token) error {
+func (currentDao *daoToken) UpdateData(data tables.Token) models.IResponse {
 
 	var finded tables.Token
 	finderData := tables.Token{GUID: data.GUID}
@@ -36,10 +36,10 @@ func (currentDao *daoToken) UpdateData(data tables.Token) error {
 	}
 
 	log.Debug("dao complete")
-	return nil
+	return currentDao.curResponse().GoodUpdate()
 }
 
-func (currentDao *daoToken) ExistData(data tables.Token) (tables.Token, error) {
+func (currentDao *daoToken) ExistData(data tables.Token) (tables.Token, models.IResponse) {
 
 	var finded tables.Token
 
@@ -50,5 +50,8 @@ func (currentDao *daoToken) ExistData(data tables.Token) (tables.Token, error) {
 	}
 
 	log.Debug("check complete")
-	return finded, nil
+	var array []tables.Token
+	array = append(array, finded)
+
+	return finded, currentDao.curResponse().GoodShow(array)
 }

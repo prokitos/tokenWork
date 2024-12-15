@@ -47,9 +47,9 @@ func (instance *TokenData) CreatePair() (string, string, error) {
 	data.GUID = instance.payload.GUID
 	data.Refresh = refreshTokenSecured
 	data.Stamp = instance.payload.Time
-	err = database.GlobalPostgres.DaoToken.UpdateData(data)
-	if err != nil {
-		return "", "", err
+	resp := database.GlobalPostgres.DaoToken.UpdateData(data)
+	if !resp.Validate() {
+		return "", "", resp.ToErrorBase()
 	}
 
 	return accessToken, refreshToken, nil
@@ -71,9 +71,9 @@ func (instance *TokenData) RefreshToken(access string, refresh string) (string, 
 	var data tables.Token
 	data.GUID = instance.payload.GUID
 	data.Stamp = accessClaim.Payload.Time
-	res, err := database.GlobalPostgres.DaoToken.ExistData(data)
-	if err != nil {
-		return "", "", err
+	res, resp := database.GlobalPostgres.DaoToken.ExistData(data)
+	if !resp.Validate() {
+		return "", "", resp.ToErrorBase()
 	}
 
 	var databaseBcryptToken string = res.Refresh
